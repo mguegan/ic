@@ -1,3 +1,4 @@
+from __future__ import print_function
 #
 #
 # who cares who did this fucking code, read it, debug it, fix it
@@ -8,6 +9,9 @@
 # 
 #
 
+from builtins import str
+from builtins import chr
+from builtins import object
 SCRIPT_NAME    = 'ic-weechat'
 SCRIPT_AUTHOR  = 'eau <eau+ic4f@unix4fun.net>'
 SCRIPT_VERSION = '20180302'
@@ -290,7 +294,7 @@ def acMessageParsePrintmsg(raw_tags, print_msg):
 #        channel = inf[BI_CHAN]
 
         # sanity checks...
-        if inf.has_key(BI_CHAN) and inf.has_key(BI_SERV) and inf.has_key(BI_NICK) and acwee.isAcEnabled(inf[BI_SERV], inf[BI_CHAN]):
+        if BI_CHAN in inf and BI_SERV in inf and BI_NICK in inf and acwee.isAcEnabled(inf[BI_SERV], inf[BI_CHAN]):
 #            print isinstance(print_msg, bytes)
 #            print isinstance(print_msg, unicode)
 #            print "PRINT MSG: %s\n" % print_msg
@@ -452,8 +456,8 @@ def pkCmdList(data, dabuffer, args):
 
     pkReply = pkMessage(acwee, server).pklist("")
     if len(pkReply['blob']) > 0:
-        if args <> None and len(args) > 0:
-            if pkReply['blob'].has_key(args) is True:
+        if args != None and len(args) > 0:
+            if (args in pkReply['blob']) is True:
                 acwee.prtAcPk(dabuffer, pkReply['blob'][args])
         else:
             for t in pkReply['blob']:
@@ -472,7 +476,7 @@ def pkCmdDel(data, dabuffer, args):
     server = weechat.buffer_get_string(dabuffer,"localvar_server")
 
 
-    if args <> None and len(args) == 0:
+    if args != None and len(args) == 0:
         acwee.pmbac("look for some help, you don't understand what you want...")
         return weechat.WEECHAT_RC_OK
 
@@ -492,7 +496,7 @@ def pkCmdGenAndBroadcast(data, dabuffer, args):
     inf = ic_get_buflocalinfo(dabuffer)
 
     # XXX TODO: check if channel or private message and IRC
-    if inf and inf.has_key(BI_TYPE) and inf.has_key(BI_NICK) and inf.has_key(BI_SERV) and inf.has_key(BI_CHAN):
+    if inf and BI_TYPE in inf and BI_NICK in inf and BI_SERV in inf and BI_CHAN in inf:
         # now we need some info to generate ephemeral keys...
         userhost = ic_get_userinfo(dabuffer, inf[BI_NICK], inf[BI_CHAN], inf[BI_SERV])
         if ( inf[BI_TYPE] == "channel" or inf[BI_TYPE] == "private" ) and len(inf[BI_NICK]) > 0:
@@ -504,7 +508,7 @@ def pkCmdGenAndBroadcast(data, dabuffer, args):
                 # get the key again.
                 pkReply = pkMessage(acwee, inf[BI_SERV]).pklist("")
                 if pkReply['bada'] is True and pkReply['errno'] == 0 and len(pkReply['blob']) > 0:
-                    if pkReply['blob'].has_key(inf[BI_NICK]) is True:
+                    if (inf[BI_NICK] in pkReply['blob']) is True:
                         myKey = pkReply['blob'][inf[BI_NICK]]
                         if myKey['HasPriv'] is True:
                             acwee.pmbac(dabuffer, "broadcasting my key on %s", inf[BI_CHAN])
@@ -570,7 +574,7 @@ def skCmd_CB(data, dabuffer, args):
         elif cmd == "help":
             return skCmdHelp(data, dabuffer, newargv)
         elif cmd == "give":
-            if len(newargv) > 0 and re.match(icNicknameRE, newargv[0], re.M) <> None:
+            if len(newargv) > 0 and re.match(icNicknameRE, newargv[0], re.M) != None:
                 return skCmdSendKey(data, dabuffer, newargv)
     return skCmdList(data, dabuffer, args)
 
@@ -632,7 +636,7 @@ def skCmdSendKey(data, dabuffer, args):
 #    weechat.prnt(dabuffer, "%sAC\tSENDKEY ARGS: %s" % (SCRIPT_COLOR, args))
 #
     inf = ic_get_buflocalinfo(dabuffer)
-    if inf and inf.has_key(BI_NICK) and inf.has_key(BI_CHAN) and inf.has_key(BI_SERV) and inf.has_key(BI_TYPE) and inf[BI_PLUG] == "irc":
+    if inf and BI_NICK in inf and BI_CHAN in inf and BI_SERV in inf and BI_TYPE in inf and inf[BI_PLUG] == "irc":
 #        acwee.pmb(dabuffer, "mynick:%s peer_nick:%s chan: %s serv:%s", inf[BI_NICK], peer, inf[BI_CHAN], inf[BI_SERV])
 #        weechat.prnt(dabuffer, "%sAC\tmynick:%s peer_nick:%s chan: %s serv:%s" % (SCRIPT_COLOR, inf[BI_NICK], peer, inf[BI_CHAN], inf[BI_SERV]))
 
@@ -655,7 +659,7 @@ def skCmdAddKey(data, dabuffer, args):
         return weechat.WEECHAT_RC_ERROR
 
     inf = ic_get_buflocalinfo(dabuffer)
-    if inf and inf.has_key(BUF_INFO_NICK) and inf.has_key(BUF_INFO_CHAN) and inf.has_key(BUF_INFO_SERV) and inf.has_key(BI_TYPE):
+    if inf and BUF_INFO_NICK in inf and BUF_INFO_CHAN in inf and BUF_INFO_SERV in inf and BI_TYPE in inf:
         if inf[BI_TYPE] == "channel" or inf[BI_TYPE] == "private":
 
             ctReply = ctMessage(acwee, inf[BI_SERV], inf[BI_CHAN]).ctadd(inf[BI_NICK], args)
@@ -670,7 +674,7 @@ def skCmdAddKey(data, dabuffer, args):
 
 def skCmdUseKey(data, dabuffer, args):
     inf = ic_get_buflocalinfo(dabuffer)
-    if inf and inf.has_key(BUF_INFO_CHAN) and inf.has_key(BUF_INFO_SERV):
+    if inf and BUF_INFO_CHAN in inf and BUF_INFO_SERV in inf:
         kexinfo = acwee.rcvKexPop(inf[BI_SERV], inf[BI_CHAN]);
         # TODO: better sanity checks..
         if kexinfo:
@@ -767,7 +771,7 @@ def acCmdToggle(data, dabuffer, args):
     nickRetObj = re.match(icNicknameRE, inf[BI_CHAN], re.M)
 #    print chanRetObj
 #    print nickRetObj
-    if inf and inf.has_key(BI_CHAN) and inf.has_key(BI_SERV) and inf.has_key(BI_TYPE) and len(inf[BI_CHAN]) > 0 and len(inf[BI_SERV]) > 0 and (inf[BI_TYPE] == "channel" or inf[BI_TYPE] == "private") and (chanRetObj <> None or nickRetObj <> None):
+    if inf and BI_CHAN in inf and BI_SERV in inf and BI_TYPE in inf and len(inf[BI_CHAN]) > 0 and len(inf[BI_SERV]) > 0 and (inf[BI_TYPE] == "channel" or inf[BI_TYPE] == "private") and (chanRetObj != None or nickRetObj != None):
         if acwee.isAcEnabled(inf[BI_SERV], inf[BI_CHAN]):
             # XXX using acEnable or acDisable here..
             acwee.acDisable(dabuffer, inf[BI_SERV], inf[BI_CHAN])
@@ -900,16 +904,16 @@ def printmsg_modifier_cb(data, modifier, modifier_data, msg_string):
 def oldprintmsg_modifier_cb(data, modifier, modifier_data, msg_string):
 #    print "HERE IN PRINTMSG MODIFIER"
 #    print "printmsg_modifier_cb()"
-    print "DATA: %s/%d" % ( str(type(data)), len(data) )
+    print("DATA: %s/%d" % ( str(type(data)), len(data) ))
 #    print data
-    print "MODIFIER: %s/%d" % (str(type(modifier)), len(modifier))
-    print "MODIFIER_DATA: %s/%d" % (str(type(modifier_data)), len(modifier_data))
-    print "MSG_STRING: %s/%d" % (str(type(msg_string)),  len(msg_string))
-    print "AVANT RETVAL NOW"
+    print("MODIFIER: %s/%d" % (str(type(modifier)), len(modifier)))
+    print("MODIFIER_DATA: %s/%d" % (str(type(modifier_data)), len(modifier_data)))
+    print("MSG_STRING: %s/%d" % (str(type(msg_string)),  len(msg_string)))
+    print("AVANT RETVAL NOW")
 #    retval = acMessageParsePrintmsg(modifier_data, msg_string)
-    print "RETVAL"
+    print("RETVAL")
 #    print retval
-    print "/RETVAL"
+    print("/RETVAL")
 #    if retval[0] is True:
 #        return ""
     return msg_string
@@ -934,7 +938,7 @@ def privmsg_out_modifier_cb(data, modifier, modifier_data, msg_string):
 #    print parsed
 
 #    if parsed.has_key(HPARSE_CHAN) and parsed.has_key(HPARSE_ARGS):
-    if parsed.has_key(HPARSE_CHAN) and parsed.has_key(HPARSE_TEXT):
+    if HPARSE_CHAN in parsed and HPARSE_TEXT in parsed:
 #        peer_nick = parsed[HPARSE_NICK]
 #        peer_host = parsed[HPARSE_HOST].split('!', 1)[1].strip()
         channel = parsed[HPARSE_CHAN]
@@ -1007,7 +1011,7 @@ def notice_in_modifier_cb(data, modifier, modifier_data, msg_string):
     parsed = weechat.info_get_hashtable("irc_message_parse", { "message": msg_string, "server": modifier_data })
 #    print "PARSED DICT"
 #    print parsed
-    if parsed.has_key(HPARSE_NICK) and parsed.has_key(HPARSE_HOST) and parsed.has_key(HPARSE_CHAN) and parsed.has_key(HPARSE_ARGS):
+    if HPARSE_NICK in parsed and HPARSE_HOST in parsed and HPARSE_CHAN in parsed and HPARSE_ARGS in parsed:
         peer_nick = parsed[HPARSE_NICK]
         peer_host = parsed[HPARSE_HOST].split('!', 1).pop().strip()
         channel = parsed[HPARSE_CHAN]
@@ -1156,7 +1160,7 @@ def privmsg_in_modifier_cb(data, modifier, modifier_data, msg_string):
 #    print "PARSED DICT"
 #    print parsed
 #    if parsed.has_key(HPARSE_NICK) and parsed.has_key(HPARSE_HOST) and parsed.has_key(HPARSE_CHAN) and parsed.has_key(HPARSE_ARGS):
-    if parsed.has_key(HPARSE_NICK) and parsed.has_key(HPARSE_HOST) and parsed.has_key(HPARSE_CHAN) and parsed.has_key(HPARSE_TEXT):
+    if HPARSE_NICK in parsed and HPARSE_HOST in parsed and HPARSE_CHAN in parsed and HPARSE_TEXT in parsed:
         peer_nick = parsed[HPARSE_NICK]
 #        peer_host = parsed[HPARSE_HOST].split('!', 1)[1].strip()
         peer_host = parsed[HPARSE_HOST].split('!', 1).pop().strip()
@@ -1337,12 +1341,12 @@ class AcExceptions(Exception):
     acExceptions = None
 
     def __init__(self, **kwargs):
-        print "our exception mechanism"
+        print("our exception mechanism")
         # format { acName= acErrMsg= }
         self.acExceptions = kwargs
 
     def __str__(self):
-        print repr(self.acExceptions)
+        print(repr(self.acExceptions))
 
 
 class IcDisplay(object):
@@ -1434,12 +1438,12 @@ class IcDisplay(object):
 
 
         #print "BYTES: " + str(isinstance(message, bytes)) + " UNICODE: " + str(isinstance(message, unicode))
-        if isinstance(message, unicode):
+        if isinstance(message, str):
             message_utf8 = message.encode('utf-8')
         elif isinstance(message, bytes):
             message_utf8 = message
 
-        if isinstance(nick, unicode):
+        if isinstance(nick, str):
             nick_utf8 = nick.encode('utf-8')
         elif isinstance(nick, bytes):
             nick_utf8 = nick
@@ -1514,13 +1518,13 @@ class IcJSCom(object):
             rcvBlob = self.acProc.stdout.read(bufsize)
         else:
             # XXX TODO: need to message the process back
-            print "PROCESS COMMUNICATION TIMEOUT!!!"
-            print "RLIST"
-            print rlist
-            print "WLIST"
-            print wlist
-            print "XLIST"
-            print xlist
+            print("PROCESS COMMUNICATION TIMEOUT!!!")
+            print("RLIST")
+            print(rlist)
+            print("WLIST")
+            print(wlist)
+            print("XLIST")
+            print(xlist)
             return [ None, "No Read List Polled" ]
         return [ rcvBlob, None ]
 
@@ -1857,7 +1861,7 @@ class IcCipherDisplay(object):
 
     def isAcEnabled(self, serv, chan):
         localKey = self._buildHash(serv, chan)
-        if self.acCipher.has_key(localKey) is True:
+        if (localKey in self.acCipher) is True:
             return self.acCipher[localKey]
         return False
 
@@ -1929,7 +1933,7 @@ class IcCore(IcDisplay, IcJSCom, IcCipherDisplay):
 
     def rcvKexPop(self, serv, chan):
         keyBlobHash = self._buildHash(serv, chan)
-        if self.acRecvKeyBlobs.has_key(keyBlobHash):
+        if keyBlobHash in self.acRecvKeyBlobs:
             kexDataList = self.acRecvKeyBlobs[keyBlobHash]
             del self.acRecvKeyBlobs[keyBlobHash]
             return kexDataList
@@ -1946,7 +1950,7 @@ class IcCore(IcDisplay, IcJSCom, IcCipherDisplay):
 
     def acGetNonce(self, serv, chan):
         keyBlobHash = self._buildHash(serv, chan)
-        if self.acNonces.has_key(keyBlobHash):
+        if keyBlobHash in self.acNonces:
             return self.acNonces[keyBlobHash]
         else:
             return -1
