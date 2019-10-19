@@ -288,7 +288,7 @@ def acMessageParsePrintmsg(raw_tags, print_msg):
 #        my_nick = inf[BI_NICK]
 #        server = inf[BI_SERV]
 #        channel = inf[BI_CHAN]
-        
+
         # sanity checks...
         if inf.has_key(BI_CHAN) and inf.has_key(BI_SERV) and inf.has_key(BI_NICK) and acwee.isAcEnabled(inf[BI_SERV], inf[BI_CHAN]):
 #            print isinstance(print_msg, bytes)
@@ -1019,7 +1019,6 @@ def notice_in_modifier_cb(data, modifier, modifier_data, msg_string):
         # while the buffer is toward the peer_nick
         # that's an ugly way to solve it, we need a way to find our nickname or to find the buffer based on peer_nick..
 
-        
         # XXX verify if the channel name is a nickname or a channel name, it is equivalent to if channel[0] != '#':
         retObj = re.match(icChannelRE, channel, re.M)
         if retObj == None:
@@ -1352,7 +1351,7 @@ class IcDisplay(object):
 
     coreBuffer = None
     acHdrColor = None
-    acHdr = None 
+    acHdr = None
     acHdrMsg = None
     acBarColor = "red"
     acDebugLevel = 0
@@ -1411,7 +1410,6 @@ class IcDisplay(object):
 #            self.pmb(buffer, "===>> %s%s!%s%s <<===" , self.acColorMyNick, p.nick, p.host, self.acColorEnd)
 #        else:
 #            self.pmb(buffer, "--->> %s%s!%s%s <<---", self.acColorNick, p.nick, p.host, self.acColorEnd)
-    
 #        self.pmb(buffer, "\_ PK: %s", p.pubkey)
 #        self.pmb(buffer, "\_ FP: %s", binascii.hexlify(p.fp))
 #        self.pmb(buffer, "\_ Created: %s @ %s", str(datetime.datetime.fromtimestamp(p.timestamp)), p.server)
@@ -1420,7 +1418,7 @@ class IcDisplay(object):
 
     def prtAcPrivMsg(self, buffer, nick, message, tags):
 #	weechat.print_date_tags(buffer)
-    	newtags = tags+',ACMSG'
+        newtags = tags+',ACMSG'
 	#weechat.prnt_date_tags(buffer, 0, newtags, message)
         #weechat.prnt(buffer, "%s(%s%s%s)%s\t%s" % (weechat.color("white"), weechat.color("lightcyan"), nick, weechat.color("white"), weechat.color("default"), message ))
 
@@ -1924,7 +1922,7 @@ class IcCore(IcDisplay, IcJSCom, IcCipherDisplay):
     def coreCleanUp(self):
         self.acCipherCleanup()
         self.acRecvKeyBlobs = {}
-    
+
     def rcvKexPush(self, serv, chan, kexDataList):
         keyBlobHash = self._buildHash(serv, chan)
         self.acRecvKeyBlobs[keyBlobHash] = kexDataList
@@ -1970,7 +1968,6 @@ class IcCore(IcDisplay, IcJSCom, IcCipherDisplay):
 #            self.pmb(dabuffer, "%s/%s [%s] -> %r", descList[0], descList[1], keyHash, self.acCipherBar[keyHash])
 
 
-    
 #
 # IcWeechat related stuff, like hooking mechanism, heartbeat, etc...
 # and get all from IcCore, communication, display, etc..
@@ -2050,13 +2047,13 @@ class IcWeechat(IcCore):
     #
     def icWeechatError(self):
         self.pmb(weechat.current_buffer(), "Bye, you got errors!")
-    
+
     def icWeechatMain(self):
         self.icStartDaemon()
         self.icBanner( weechat.current_buffer() )
         self.icEnvInit()
         self.icHooks()
-    
+
     def icWeechatExit(self):
         self.icUnHooks()
         self.icStopDaemon()
